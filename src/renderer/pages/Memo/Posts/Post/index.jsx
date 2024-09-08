@@ -15,14 +15,18 @@ import Reply from './Reply';
 import { VirtualListContext } from '../../../../context/VirtualListContext';
 import styles from './Post.module.scss';
 import { NeedleIcon, ReflectIcon } from '../../../../icons';
+import Category from './Category';
+import { useCategoryContext } from '../../../../context/CategoryContext';
+import { Stars } from 'lucide-react';
 
 const Post = memo(({ postPath, searchTerm = null, repliesCount = 0 }) => {
   console.log('Post component rendered with path:', postPath);
   const { currentMemo, getCurrentMemoPath } = useMemoContext();
+  const { categories } = useCategoryContext();
   const { post, cycleColor, refreshPost, setHighlight } = usePost(postPath);
   const [hovering, setHover] = useState(false);
   const [replying, setReplying] = useState(false);
-  const [isAIResplying, setIsAiReplying] = useState(false);
+  const [isAIReplying, setIsAiReplying] = useState(false);
   const [editable, setEditable] = useState(false);
 
   useEffect(() => {
@@ -86,7 +90,7 @@ const Post = memo(({ postPath, searchTerm = null, repliesCount = 0 }) => {
     <div
       ref={containerRef}
       className={`${styles.root} ${
-        (replying || isAIResplying) && styles.focused
+        (replying || isAIReplying) && styles.focused
       }`}
       tabIndex="0"
       onMouseEnter={handleRootMouseEnter}
@@ -97,7 +101,10 @@ const Post = memo(({ postPath, searchTerm = null, repliesCount = 0 }) => {
       <div className={styles.post}>
         <div className={styles.left}>
           {post.data?.isReply && <div className={styles.connector}></div>}
-          
+          <Category 
+          isAI={isAI}
+          categoryColor={post?.data?.category}
+          />
           <div
             className={`${styles.line} ${
               (post.data?.replies?.length > 0 || replying) && styles.show
@@ -179,13 +186,13 @@ const Post = memo(({ postPath, searchTerm = null, repliesCount = 0 }) => {
                   }}
                 ></div>
                 <div
-                  className={`${styles.ball} ${isAIResplying && styles.ai}`}
+                  className={`${styles.ball} ${isAIReplying && styles.ai}`}
                   style={{
                     backgroundColor: highlightColor,
                   }}
                 >
-                  {isAIResplying && (
-                    <AIIcon className={`${styles.iconAI} ${styles.replying}`} />
+                  {isAIReplying && (
+                    <Stars className={`${styles.iconAI} ${styles.replying}`} />
                   )}
                 </div>
               </div>
@@ -198,7 +205,7 @@ const Post = memo(({ postPath, searchTerm = null, repliesCount = 0 }) => {
                     editable
                     isReply
                     closeReply={closeReply}
-                    isAI={isAIResplying}
+                    isAI={isAIReplying}
                   />
                 </div>
               </div>

@@ -183,7 +183,7 @@ class MemoIndex {
 
   update(relativeFilePath, data) {
     this.index.set(relativeFilePath, data);
-    memoSearchIndex.initialize(this.memoPath, this.index);
+    memoSearchIndex.initializeIndex(this.memoPath, this.index);
     memoEmbeddings.addDocument(relativeFilePath, data);
     this.save();
     return this.index;

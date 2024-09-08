@@ -11,6 +11,8 @@ import { AIContextProvider } from './context/AIContext';
 import { BookmarksContextProvider } from './context/BookmarksContext';
 import { VirtualListContextProvider } from './context/VirtualListContext';
 import { IndexContextProvider } from './context/IndexContext';
+import { CategoryContextProvider } from './context/CategoryContext';
+import { MemoToastsContextProvider } from './context/ToastContext';
 
 if ('scrollRestoration' in history) {
   history.scrollRestoration = 'manual';
@@ -42,9 +44,11 @@ export default function App() {
   return (
     <MemoContextProvider>
       <AIContextProvider>
+        <MemoToastsContextProvider>
         <IndexContextProvider>
         <BookmarksContextProvider>
           <VirtualListContextProvider>
+            <CategoryContextProvider>
       <AnimatePresence mode="wait">
         <Routes location={location} key={location.pathname}>
           <Route
@@ -73,14 +77,15 @@ export default function App() {
 
           >
             <Route path="category/:categoryName" element={} />
-            <Route path="feed" element={} />
-            <Route path="bookmarks" element={} />
+            
           </Route>
         </Routes>
       </AnimatePresence>
+      </CategoryContextProvider>
       </VirtualListContextProvider>
       </BookmarksContextProvider>
       </IndexContextProvider>
+      </MemoToastsContextProvider>
       </AIContextProvider>
     </MemoContextProvider>
   );

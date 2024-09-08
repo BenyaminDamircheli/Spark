@@ -6,7 +6,6 @@ import {
   useCallback,
   createContext,
 } from 'react';
-import OpenAI from 'openai';
 import { useMemoContext } from './MemoContext';
 import { useElectronStore } from '../hooks/useElectronStore';
 
@@ -37,70 +36,69 @@ export const AIContextProvider = ({ children }) => {
   );
   const [baseUrl, setBaseUrl] = useElectronStore('baseUrl', OLLAMA_URL);
 
-  // Written this way because I want to add openAI support in the future.
+  useEffect(() => {
+    setMemoAIProvider('ollama');
+    setEmbeddingModel('mxbai-embed-large');
+  }, []);
+
   const setupAI = useCallback(() => {
     if (memoAIProvider === 'ollama') {
       setAI({ type: 'ollama' });
     }
-  }, [memoAIProvider, baseUrl]);
+  }, [memoAIProvider]);
 
   useEffect(() => {
     if (currentMemo) {
       if (currentMemo.AIPrompt) setPrompt(currentMemo.AIPrompt);
       setupAI();
     }
-  }, [currentMemo, setupAI, baseUrl]);
+  }, [currentMemo, setupAI]);
 
-  const generate = useCallback(() => {
-    async (context, callback) => {
-      if (!ai) return;
+  const generate = useCallback(async (context, callback) => {
+    if (!AI) return;
 
-      try {
-        const response = await fetch(
-          { OLLAMA_URL },
-          {
-            method: 'POST',
-            headers: {
-              'Content-Type': 'application/json',
-            },
-            body: JSON.stringify({
-              model,
-              messages: context,
-            }),
-          },
+    try {
+      const response = await fetch(baseUrl, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          model,
+          messages: context,
+        }),
+      });
+
+      if (!response.ok) {
+        console.log(
+          'Failed to generate with Ollama, status:',
+          response.status,
         );
+        return;
+      }
 
-        if (!response.ok) {
-          console.log(
-            'failed to generate with OLLMA, status:',
-            response.status,
-          );
-          return;
-        }
+      const reader = response.body.getReader();
+      const decoder = new TextDecoder();
 
-        const reader = response.body.getReader();
-        const decoder = new TextDecoder();
+      while (true) {
+        const { value, done } = await reader.read();
+        if (done) break;
 
-        while (true) {
-          const { value, done } = await reader.read();
-          if (done) break;
+        const chunk = decoder.decode(value);
+        const lines = chunk.split('\n');
 
-          const chunk = decoder.decode(value);
-          const lines = chunk.split('\n');
-
-          for (const line of line) {
-            if (line.trim() !== '') {
-              const data = JSON.parse(line);
-              if (!data.done) {
-                callback(data.response);
-              }
+        for (const line of lines) {
+          if (line.trim() !== '') {
+            const data = JSON.parse(line);
+            if (!data.done) {
+              callback(data.message.content);
             }
           }
         }
-      } catch (error) {
-        console.log('failed to generate with OLLMA, error:', error);
       }
-    };
+    } catch (error) {
+      console.log('Failed to generate with Ollama, error:', error);
+    }
   }, [AI, model, baseUrl]);
 
   const prepareCompletionContext = useCallback(
@@ -109,7 +107,7 @@ export const AIContextProvider = ({ children }) => {
         { role: 'system', content: prompt },
         {
           role: 'system',
-          content: 'It is EXTREMELY important that you ONLY respond with plaintext, NEVER use markdown or HTML.',
+          content: 'It is EXTREMELY important that you ONLY respond with plaintext, NEVER use markdown or HTML. ONLY respond in around 30 words maximum.',
         },
         ...thread.map((post) => ({ role: 'user', content: post.content })),
       ];
@@ -135,7 +133,7 @@ export const AIContextProvider = ({ children }) => {
       memoAIProvider,
       setMemoAIProvider,
     }),
-    [generate],
+    [AI, baseUrl, prompt, currentMemo, model, embeddingModel, generate, prepareCompletionContext, memoAIProvider],
   );
 
   return (

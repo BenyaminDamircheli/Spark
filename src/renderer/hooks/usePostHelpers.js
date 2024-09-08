@@ -1,131 +1,157 @@
 import {
-    getDirectoryPath,
-    generateMarkdown,
-    getFilePathForNewPost,
-    saveFile,
-    createDirectory,
-    deleteFile,
-  } from '../utils/fileOperations';
-  import matter from 'gray-matter';
+  generateMarkdown,
+  createDirectory,
+  saveFile,
+  deleteFile,
+  getFilePathForNewPost,
+  getDirectoryPath,
+} from '../utils/fileOperations';
 
-
-  export const getPost = async (postPath) => {
-    try {
-      if (!postPath) return null;
-      
-      const fileContent = await window.electron.ipc.invoke(`get-file`, postPath);
-      console.log('File content:', fileContent);
-      
-      if (!fileContent) {
-        console.error('File content is empty or null');
-        
-      }
-      
-      const parsedContent = await window.electron.ipc.invoke('matter-parse', fileContent);
-      console.log('Parsed content:', parsedContent);
-      
-      if (!parsedContent || !parsedContent.content) {
-        console.error('Parsed content is invalid');
-        
-      }
-      
-      const post = {content: parsedContent.content, data: parsedContent.data || {}};
-      return post;
-    } catch (error) {
-      console.error('Error getting post:', error);
-      
-    }
+export const getPost = async (postPath) => {
+  try {
+    if (!postPath) return;
+    const fileContent = await window.electron.ipc.invoke('get-file', postPath);
+    const parsed = await window.electron.ipc.invoke(
+      'matter-parse',
+      fileContent
+    );
+    const post = { content: parsed.content, data: parsed.data };
+    return post;
+  } catch (error) {
+    // TODO: check and cleanup after these files
   }
+};
 
-  export const attatchToPostCreator = (setPost, getCurrentMemoPath) => (imageData, fileExtention) => {
-    const memoPath = getCurrentMemoPath();
+export const attatchToPostCreator =
+  (setPost, getCurrentPilePath) => async (imageData, fileExtension) => {
+    const storePath = getCurrentPilePath();
 
-    let attatchments = [];
+    let newAttachments = [];
     if (imageData) {
-        // If there is an image data, save it to a file.
-        const newFilePath = window.electron.ipc.invoke('save-file', 
-            {
-                content: imageData,
-                fileExtention: fileExtention,
-                memoPath: memoPath
-            }   
-        );
+      // save image data to a file
+      const newFilePath = await window.electron.ipc.invoke('save-file', {
+        fileData: imageData,
+        fileExtension: fileExtension,
+        storePath: storePath,
+      });
 
-        if (newFilePath){
-            attatchments.push(newFilePath);
+      if (newFilePath) {
+        newAttachments.push(newFilePath);
+      } else {
+        console.error('Failed to save the pasted image.');
+      }
+    } else {
+      newAttachments = await window.electron.ipc.invoke('open-file', {
+        storePath: storePath,
+      });
+    }
+    // Attachments are stored relative to the base path from the
+    // base directory of the pile
+    const correctedPaths = newAttachments.map((path) => {
+      const pathArr = path.split(/[/\\]/).slice(-4);
+      const newPath = window.electron.joinPath(...pathArr);
+
+      return newPath;
+    });
+
+    setPost((post) => {
+      const attachments = [...correctedPaths, ...(post.data.attachments)];
+      const newPost = {
+        ...post,
+        data: { ...post.data, attachments },
+      };
+
+      return newPost;
+    });
+  };
+
+export const detachFromPostCreator =
+  (setPost, getCurrentPilePath) => (attachmentPath) => {
+    setPost((post) => {
+      let newPost = JSON.parse(JSON.stringify(post));
+      const newAtt = newPost.data.attachments.filter(
+        (a) => a !== attachmentPath
+      );
+
+      newPost.data.attachments = newAtt;
+
+      const fullPath = window.electron.joinPath(
+        getCurrentPilePath(),
+        attachmentPath
+      );
+
+      window.electron.deleteFile(fullPath, (err) => {
+        if (err) {
+          console.error('There was an error:', err);
         } else {
-            console.error('Error saving image file');
+          console.log('File was deleted successfully');
         }
-    } else{
-        newAttatchments = window.electron.ipc.invoke('open-file', {
-            memoPath: memoPath
-        })
+      });
+
+      console.log('Attachment removed', attachmentPath);
+
+      return newPost;
+    });
+  };
+
+export const tagActionsCreator = (setPost, action) => {
+  return (tag) => {
+    setPost((post) => {
+      if (action === 'add' && !post.data.tags.includes(tag)) {
+        return {
+          ...post,
+          data: {
+            ...post.data,
+            tags: [...post.data.tags, tag],
+          },
+        };
+      }
+      if (action === 'remove' && post.data.tags.includes(tag)) {
+        return {
+          ...post,
+          data: {
+            ...post.data,
+            tags: post.data.tags.filter((t) => t !== tag),
+          },
+        };
+      }
+      return post;
+    });
+  };
+};
+
+export const setHighlightCreator = (post, setPost, savePost) => {
+  return (highlight) => {
+    setPost((post) => ({
+      ...post,
+      data: { ...post.data, highlight: highlight },
+    }));
+    savePost({ highlight: highlight });
+  };
+};
+
+export const cycleColorCreator = (post, setPost, savePost, highlightColors) => {
+  return () => {
+    if (!post.data.highlightColor) {
+      const newColor = highlightColors[1];
+      setPost((post) => ({
+        ...post,
+        data: { ...post.data, highlightColor: newColor },
+      }));
+      savePost({ highlightColor: newColor });
+      return;
     }
+    const currentColor = post.data.highlightColor;
+    const currentIndex = highlightColors.findIndex(
+      (color) => color === currentColor
+    );
+    const nextIndex = (currentIndex + 1) % highlightColors.length;
+    const nextColor = highlightColors[nextIndex];
 
-    const correctedPaths = attatchments.map((path) => {
-        const pathArr = path.split(/[/\\]/).slice(-4)
-        const newPath = window.electron.joinPath(...pathArr);
-        return newPath;
-    })
-
-    const setPost = (post) =>{
-        const attatchments = [...correctedPaths, ...post.data.attatchments]
-        const newPost = {
-            ...post,
-            data: {...post.data, attatchments}
-        }
-        return newPost;
-    }
-
-  }
-
-  export const detachFromPostCreator = (setPost, getCurrentMemoPath) => (attatchmentPath) => {
-    setPost(
-        (post) => {
-            let newPost = JSON.parse(JSON.stringify(post));
-            // filters out attatchment form post, doesn't delete from file system.
-            const newAttatchments = newPost.data.attatchments.filter((att) = att !== attatchmentPath)
-            newPost.data.attatchments = newAttatchments;
-
-            const fullPath = window.electron.joinPath(getCurrentMemoPath(), attatchmentPath);
-
-            window.electron.ipc.invoke('delete-file', fullPath, (err) => {
-                if (err) {
-                    console.error('Error deleting file:', err)
-                } else{
-                    console.log('file deleted successfully')
-                }
-            });
-            console.log('attatchment removed')
-
-            return newPost;
-        }
-    )
-  }
-
-
-  export const tagActionsCreator = (setPost, action) => {
-    return (tag) => {
-        setPost((post) => {
-            if (action === "add"){
-                return{
-                    ...post,
-                    data: {
-                        ...post.data,
-                        tags: [...post.data.tags, tag]
-                    },
-                };
-            }
-            if (action === 'remove' && post.data.tags.includes(tag)){
-                return{
-                    ...post,
-                    data:{
-                        ...post.data,
-                        tags: post.data.tags.filter((t) => t !== tag)
-                    },
-                };
-            }
-            return post
-        })
-    }
-  }
+    setPost((post) => ({
+      ...post,
+      data: { ...post.data, highlightColor: nextColor },
+    }));
+    savePost({ highlightColor: nextColor });
+  };
+};

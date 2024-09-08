@@ -9,8 +9,8 @@ const presetColors = [
 ];
 
 const defaultCategories = new Map([
-    ['Do Later', {color: '#4de64d', posts: []}],
-    ['New Ideas', {color: '#017AFF', posts: []}],
+    ['Do Later', {color: '#4169E1', posts: []}],
+    ['New Ideas', {color: '#391656', posts: []}],
 ])
 
 class MemoCategory {
@@ -41,7 +41,7 @@ class MemoCategory {
             return this.categories;
         } else {
             this.categories = defaultCategories;
-            this.save();
+            
             return this.categories;
         }
     }
@@ -72,7 +72,7 @@ class MemoCategory {
         }
 
         this.categories.set(categoryName, [categoryName, newCategory]);
-        this.save();
+        
         return this.categories;
     }
 

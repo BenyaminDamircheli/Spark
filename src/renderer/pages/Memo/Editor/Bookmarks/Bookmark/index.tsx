@@ -2,6 +2,7 @@ import { useState, useCallback, useEffect } from 'react';
 import { Tweet } from 'react-tweet';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useBookmarksContext } from '../../../../../context/BookmarksContext';
+
 import { Link2 } from 'lucide-react';
 import styles from './Bookmark.module.scss'
 

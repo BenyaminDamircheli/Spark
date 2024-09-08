@@ -78,7 +78,7 @@ const saveFiles = async (directoryPath, files) => {
 
 const deleteFile = async (filePath) => {
     return new Promise ((resolve, reject) => {
-        window.electron.removeFile(filePath, (err) => {
+        window.electron.deleteFile(filePath, (err) => {
             if (err) reject(err);
             resolve();
         });

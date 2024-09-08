@@ -1,12 +1,13 @@
 import {useParams, Link} from 'react-router-dom';
 import {useEffect, useState, useMemo} from 'react';
-// import memoIndex from '../../../main/utils/memoIndex';
+import { useIndexContext } from '../../context/IndexContext';
 import {DateTime} from 'luxon';
 import { AnimatePresence, motion } from 'framer-motion';
 import styles from './Memo.module.scss';
 import { Search, Home, Settings, Brain, BrainCircuit} from 'lucide-react';
 import SideBar from './SideBar';
 import BookmarkPreviews from './BookmarkPage';
+import Toasts from './Toasts';
 
 
 
@@ -15,7 +16,7 @@ import BookmarkPreviews from './BookmarkPage';
 
 export default function memoLayout({ children }){
     const {memoName} = useParams();
-    // const { index, refreshIndex } = useIndexContext();
+     const { index, refreshIndex } = useIndexContext();
 
     const [now, setNow] = useState(DateTime.now().toFormat('cccc, LLL dd, yyyy'))
 
@@ -34,7 +35,7 @@ export default function memoLayout({ children }){
                     <div className={styles.top}>
                         <div className={styles.part}>
                             <div className={styles.count}>
-                                <span>1 entries</span>
+                                <span>{index.size} entries</span>
                             </div>
                         </div>
                     </div>
@@ -57,7 +58,7 @@ export default function memoLayout({ children }){
 
                         </div>
                         <div className={`${styles.right} gap-[10px] `}>
-                            {/* <Toasts> TODO, COME BACK LATER */}
+                            <Toasts />
                             <BrainCircuit strokeWidth={3} className='w-5' />
                             <Search strokeWidth={4} className='w-5' />
                             <Settings strokeWidth={3} className='w-5' />

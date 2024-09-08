@@ -10,7 +10,7 @@ import Placeholder from '@tiptap/extension-placeholder';
 import CharacterCount from '@tiptap/extension-character-count';
 import TaskList from '@tiptap/extension-task-list';
 import TaskItem from '@tiptap/extension-task-item';
-import { Disc, Image, Trash, Tag } from 'lucide-react';
+import { Image } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { postFormat } from '../../../utils/fileOperations';
 import { useParams } from 'react-router-dom';
@@ -21,8 +21,8 @@ import { useAIContext } from '../../../context/AIContext';
 import useThread from '../../../hooks/useThread';
 
 import BookmarkPreviews from './Bookmarks';
+import { useMemoToastsContext } from '../../../context/ToastContext';
 
-//Escape special characters and highlight terms functions commented out
 const escapeRegExp = (string) => {
   return string.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
 };
@@ -36,15 +36,26 @@ const highlightTerms = (text, term) => {
   );
 };
 
-const Editor = memo(({ postPath, isReply, closeReply, parentPostPath, reloadParentPost, isAI, editable = true, category = null, searchTerm = null }) => {
+const Editor = memo(({ 
+  postPath, 
+  isReply, 
+  closeReply, 
+  parentPostPath, 
+  reloadParentPost, 
+  isAI, 
+  editable = true, 
+  category = null, 
+  searchTerm = null,
+  setEditable = () => {}
+}) => {
   console.log('Editor component rendered with path:', postPath);
   const {
     post,
     savePost,
     addTag,
     removeTag,
-    attachToPost,
-    detachFromPost,
+    // attachToPost,
+    // detachFromPost,
     setContent,
     resetPost,
     deletePost,
@@ -52,6 +63,7 @@ const Editor = memo(({ postPath, isReply, closeReply, parentPostPath, reloadPare
   
   const { getThread } = useThread();
   const { ai, prompt, model, generate, prepareCompletionContext } = useAIContext(); 
+  const { addNotification, removeNotification } = useMemoToastsContext();
   
   const isNew = !postPath;
 
@@ -77,28 +89,28 @@ const Editor = memo(({ postPath, isReply, closeReply, parentPostPath, reloadPare
   });
 
   const closeReplyFunction = () => {
-    closeReply;
+    if (closeReply) closeReply();
   };
 
-  const handleFile = (file) => {
-    if (file && file.type.indexOf('image') === 0) {
-      const fileName = file.name;
-      const fileExtension = fileName.split('.').pop();
-      const reader = new FileReader();
-      reader.onload = (e) => {
-        const imageData = reader.result;
-        attachToPost(imageData, fileExtension);
-      };
-      reader.readAsDataURL(file);
-    }
-  };
+  // const handleFile = (file) => {
+  //   if (file && file.type.indexOf('image') === 0) {
+  //     const fileName = file.name;
+  //     const fileExtension = fileName.split('.').pop();
+  //     const reader = new FileReader();
+  //     reader.onload = (e) => {
+  //       const imageData = reader.result;
+  //       attachToPost(imageData, fileExtension);
+  //     };
+  //     reader.readAsDataURL(file);
+  //   }
+  // };
 
-  const handleDataTransferItem = (item) => {
-    const file = item.getAsFile();
-    if (file) {
-      handleFile(file);
-    }
-  };
+  // const handleDataTransferItem = (item) => {
+  //   const file = item.getAsFile();
+  //   if (file) {
+  //     handleFile(file);
+  //   }
+  // };
 
   const editor = useEditor({
     extensions: [
@@ -112,36 +124,36 @@ const Editor = memo(({ postPath, isReply, closeReply, parentPostPath, reloadPare
       CharacterCount
     ],
     editorProps: {
-      handlePaste: (view, event, slice) => {
-        const items = Array.from(event.clipboardData.items);
-        let imageHandled = false;
+      // handlePaste: (view, event, slice) => {
+      //   const items = Array.from(event.clipboardData.items);
+      //   let imageHandled = false;
 
-        if (items) {
-          items.forEach((item) => {
-            if (item.type && item.type.indexOf('image') === 0) {
-              imageHandled = true;
-              handleDataTransferItem(item);
-            }
-          })
-        }
-        return imageHandled;
-      },
+      //   if (items) {
+      //     items.forEach((item) => {
+      //       if (item.type && item.type.indexOf('image') === 0) {
+      //         imageHandled = true;
+      //         handleDataTransferItem(item);
+      //       }
+      //     })
+      //   }
+      //   return imageHandled;
+      // },
 
-      handleDrop: (view, event, slice, moved) => {
-        let imageHandled = false;
-        if (
-          !moved &&
-          event.dataTransfer &&
-          event.dataTransfer.items &&
-          event.dataTransfer.files &&
-          event.dataTransfer.files[0]
-        ) {
-          const files = Array.from(event.dataTransfer.files);
-          files.forEach(handleFile);
-          return imageHandled;
-        }
-        return imageHandled;
-      }
+      // handleDrop: (view, event, slice, moved) => {
+      //   let imageHandled = false;
+      //   if (
+      //     !moved &&
+      //     event.dataTransfer &&
+      //     event.dataTransfer.items &&
+      //     event.dataTransfer.files &&
+      //     event.dataTransfer.files[0]
+      //   ) {
+      //     const files = Array.from(event.dataTransfer.files);
+      //     files.forEach(handleFile);
+      //     return imageHandled;
+      //   }
+      //   return imageHandled;
+      // }
     },
     autofocus: true,
     editable: editable,
@@ -164,7 +176,7 @@ const Editor = memo(({ postPath, isReply, closeReply, parentPostPath, reloadPare
   };
 
   const handleMouseMove = (e) => {
-    if (isDragging && elRef.current) {
+    if (isDragging && elementRef.current) {
       const delta = e.clientX - prevDragPos;
       elementRef.current.scrollLeft -= delta;
       setPrevDragPos(e.clientX);
@@ -181,35 +193,52 @@ const Editor = memo(({ postPath, isReply, closeReply, parentPostPath, reloadPare
     generateAiResponse();
   }, [editor, isAI]);
 
-  const generateAiResponse = useCallback(async () =>{
-    if (!editor || isAIResponding
-      || !isAI || !editor.state.doc.textContent.length === 0
-    ) 
-    return;
+  const generateAiResponse = useCallback(async () => {
+    if (!editor || isAIResponding || !isAI || editor.state.doc.textContent.length !== 0) 
+      return;
+
+    addNotification({
+      id: 'reflecting',
+      type: 'reflecting',
+      message: 'talking to AI',
+      dismissTime: 10000,
+    });
+    setEditable(false);
+    setIsAiResponding(true);
 
     try {
       const thread = await getThread(parentPostPath);
       const context = prepareCompletionContext(thread);
 
-      if (context.length == 0) return;
+      if (context.length === 0) return;
 
       await generate(context, (token) => {
         editor.commands.insertContent(token);
-      })
-
+      });
     } catch (error) {
-      console.log("failed to generate AI response");
+      addNotification({
+        id: 'reflecting',
+        type: 'failed',
+        message: 'AI request failed',
+        dismissTime: 12000,
+        onEnter: closeReplyFunction,
+      });
     } finally {
+      removeNotification('reflecting');
       setIsAiResponding(false);
     }
-  }, 
-    [editor,
-      isAI,
-      generate,
-      prepareCompletionContext,
-      getThread,
-      parentPostPath,]
-  );
+  }, [
+    editor,
+    isAI,
+    generate,
+    prepareCompletionContext,
+    getThread,
+    parentPostPath,
+    addNotification,
+    removeNotification,
+    setEditable,
+    closeReplyFunction
+  ]);
 
   const handleSubmit = useCallback(async () => {
     await savePost();
@@ -219,9 +248,9 @@ const Editor = memo(({ postPath, isReply, closeReply, parentPostPath, reloadPare
       return;
     }
 
-     closeReplyFunction();
-     setEditable(false);
-  }, [editor, isNew, post]);
+    closeReplyFunction();
+    setEditable(false);
+  }, [editor, isNew, post, savePost, resetPost, closeReplyFunction, setEditable]);
 
   useEffect(() => {
     if (editor) {
@@ -246,7 +275,6 @@ const Editor = memo(({ postPath, isReply, closeReply, parentPostPath, reloadPare
     };
   }, [handleSubmit, editor]);
 
-
   useEffect(() => {
     if (editor) {
       if (!post) return;
@@ -256,22 +284,23 @@ const Editor = memo(({ postPath, isReply, closeReply, parentPostPath, reloadPare
     }
   }, [post, editor]);
 
-  const triggerAttachment = () => attachToPost();
+  // const triggerAttachment = () => attachToPost();
 
   useEffect(() => {
     if (editor) {
       editor.setEditable(editable);
     }
     setDeleteStep(0);
-  }, [editable]);
+  }, [editable, editor]);
 
   const handleOnDelete = useCallback(async () => {
-    if (deleteStep == 0) {
+    if (deleteStep === 0) {
       setDeleteStep(1);
       return;
     }
     await deletePost();
-  }, [deleteStep]);
+    closeReplyFunction();
+  }, [deleteStep, deletePost, closeReplyFunction]);
 
   const isBig = useCallback(() => {
     return editor?.storage.characterCount.characters() < 280;
@@ -286,7 +315,6 @@ const Editor = memo(({ postPath, isReply, closeReply, parentPostPath, reloadPare
 
   if (!post) return null;
 
-  //for the search functionality.
   let previewContent = post.content;
   if (searchTerm && !editable){
     previewContent = highlightTerms(previewContent, searchTerm);
@@ -297,14 +325,16 @@ const Editor = memo(({ postPath, isReply, closeReply, parentPostPath, reloadPare
       {editable ? (
         <EditorContent
           key={'new'}
-          className={`${styles.editor} ${isBig() && 'text-xs'}`}
+          className={`${styles.editor} ${isBig() && 'text-xs'} ${
+            isAIResponding && styles.responding
+          }`}
           editor={editor}
         />
       ) : (
         <div className={styles.uneditable}>
           <div
             key="uneditable"
-            className={`${styles.editor} ${isBig() && 'text-xs'}`}
+            className={`${styles.editor} ${isBig() && 'text-xs!'}`}
             dangerouslySetInnerHTML={{ __html: previewContent }}
           />
         </div>
@@ -315,9 +345,9 @@ const Editor = memo(({ postPath, isReply, closeReply, parentPostPath, reloadPare
       {editable && (
         <div className={styles.footer}>
         <div className={styles.left}>
-          <button className={styles.button} onClick={triggerAttachment}>
+          {/* <button className={styles.button} onClick={triggerAttachment}>
             <Image className='w-5 h-5' strokeWidth={2.7} />
-          </button>
+          </button> */}
         </div>
         <div className={styles.right}>
           {isReply && (
@@ -325,13 +355,12 @@ const Editor = memo(({ postPath, isReply, closeReply, parentPostPath, reloadPare
               Close
             </button>
           )}
-          {/* delete the editable later */}
-          {isNew && editable  && (
+          {!isNew && (
             <button
               className={styles.deleteButton}
               onClick={handleOnDelete}
             >
-              {deleteStep == 0 ? 'Delete' : 'Click again to confirm'}
+              {deleteStep === 0 ? 'Delete' : 'Click again to confirm'}
             </button>
           )}
           <button

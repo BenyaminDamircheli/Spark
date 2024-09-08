@@ -9,7 +9,7 @@ const Sidebar = () => {
   return (
     <div className="w-full text-[#252422] p-4 flex flex-col">
       <div className="mb-6">
-        <Link to={`/memo/${memoName}/feed`} className="mb-2 text-[14px] block group hover:font-bold transition-all">Feed</Link>
+        <Link to={`/memo/${memoName}`} className="mb-2 text-[14px] block group hover:font-bold transition-all">Feed</Link>
         <Link to={`/memo/${memoName}/bookmarks`} className="mb-2 text-[14px] block group hover:font-bold transition-all">Bookmarks</Link>
       </div>
       

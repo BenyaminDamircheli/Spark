@@ -8,12 +8,14 @@ import {
 import { useLocation } from 'react-router-dom';
 import { useMemoContext } from './MemoContext';
 import { useAIContext } from './AIContext';
+import { useMemoToastsContext } from './ToastContext';
 
 export const BookmarksContext = createContext();
 
 export const BookmarksContextProvider = ({ children }) => {
     const { currentMemo, getCurrentMemoPath } = useMemoContext();
     const { AI } = useAIContext();
+    const { addNotification } = useMemoToastsContext();
     
 
     const getBookmarks = useCallback(async (url) => {
@@ -27,6 +29,14 @@ export const BookmarksContextProvider = ({ children }) => {
         if (preview) {
             return preview;
         }
+
+        addNotification({
+            id: 'bookmark-preview',
+            type: 'reflecting',
+            title: 'Generating preview for links',
+            message: 'Generating preview for links',
+            dismissTimeout: 10000,
+        });
 
         console.log('No cached preview, generating new one');
         

@@ -126,7 +126,7 @@ function usePost(
       };
       const fileContents = await fileOperations.generateMarkdown(content, data);
       await fileOperations.saveFiles(fullParentPostPath, fileContents);
-      // updateIndex(parentPostPath, data);
+      updateIndex(parentPostPath, data);
       reloadParentPost(parentPostPath);
     };
   
@@ -148,12 +148,13 @@ function usePost(
         };
         const fileContents = await fileOperations.generateMarkdown(content, data);
         await fileOperations.saveFiles(fullParentPostPath, fileContents);
+        updateIndex(parentPostPath, data);
         await reloadParentPost();
       }
   
       // delete file and remove from index
       await fileOperations.deleteFile(fullPostPath);
-      // removeIndex(postPath);
+      removeIndex(postPath);
     }, [postPath, reloadParentPost, parentPostPath, post]);
   
     const postActions = useMemo(

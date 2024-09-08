@@ -30,9 +30,9 @@ export default function Home() {
     const renderMemos = () => {
         if (memos.length === 0) {
             return (
-                <div className='bg-[#E5D9B6] font-bold my-3 text-[#5F4B32] text-[12px] p-3 rounded-lg max-w-[200px] text-center mx-auto leading-[1.35]'>
-                    <p>No existing memos.</p>
-                    <p>Start by creating a new one.</p>
+                <div className=' font-bold my-3 text-[#5F4B32] p-3 rounded-lg max-w-[200px] text-center mx-auto'>
+                    <p className='text-sm'>No existing collections.</p>
+                    <p className='text-sm'>Start by creating a new one.</p>
                 </div>
             )
         }
@@ -87,7 +87,7 @@ export default function Home() {
                         </div>
                         <div className='border-t border-[#A4BE7B] opacity-40 w-16 mx-auto mb-4'></div>
                         <div>
-                            <p className='text-[#5F4B32] text-xs font-semibold'>Yarn v0.0.1</p>
+                            <p className='text-[#5F4B32] text-xs font-semibold'>Spark v0.0.1</p>
                         </div>
                     </div>
                 </div>
