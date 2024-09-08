@@ -1,0 +1,5 @@
+import "./handlers/file"
+import "./handlers/bookmarks"
+import "./handlers/index"
+import "./handlers/keys"
+import "./handlers/store"

@@ -1,0 +1,164 @@
+.ProseMirror {
+    outline: none;
+    min-height: 0px;
+    display: block;
+    position: relative;
+    color: #252422;
+
+    p.is-editor-empty:first-child::before {
+        color: #AEA392;
+        content: attr(data-placeholder);
+        float: left;
+        height: 0;
+        pointer-events: none;
+    }
+
+    >*+* {
+        margin-top: 0.75em;
+    }
+
+    p {
+        margin: 0;
+        line-height: 1.6;
+        font-size: 16px;
+        margin-bottom: 1.5em;
+    }
+
+    ul,
+    ol {
+        padding: 0 1.5rem;
+        margin: 0.2rem 0;
+        list-style-position: outside;
+    }
+
+    ul {
+        list-style-type: disc;
+        font-size: 16px;
+    }
+
+    ol {
+        list-style-type: decimal; 
+        font-size: 16px;
+    }
+
+    li {
+        margin-bottom: 0.25em; 
+        font-size: 16px;
+    }
+
+    ul[data-type='taskList'] {
+        margin: 0;
+        padding: 0;
+
+        li {
+            display: flex;
+            align-items: center;
+            margin: 0 0 8px 0;
+
+            >label {
+                display: flex;
+                align-items: center;
+                flex: 0 0 auto;
+                margin-right: 0.75rem;
+                user-select: none;
+                height: 20px;
+                width: 20px;
+
+                input {
+                    background: #8B9E6B;
+                    height: 18px;
+                    width: 18px;
+                    margin: 0;
+                    padding: 0;
+                    border-radius: 4px;
+                    
+                }
+
+            }
+
+            >div {
+                flex: 1 1 auto;
+            }
+        }
+    }
+
+    h1,
+    h2,
+    h3,
+    h4,
+    h5,
+    h6 {
+        line-height: 1.3;
+        margin: 1rem 0 0.5rem;
+        font-weight: 600;
+        font-family: Roboto;
+    }
+
+    h1 {
+        font-size: 1.85rem;
+        padding-bottom: 0.3rem;
+        
+    }
+
+    h2 {
+        font-size: 1.5rem;
+    }
+
+    h3 {
+        font-size: 1.35rem;
+    }
+
+    h4 {
+        font-size: 1.1rem;
+    }
+
+    h5 {
+        font-size: 0.975rem;
+    }
+
+    h6 {
+        font-size: 0.85rem;
+    }
+
+    code {
+        background-color: rgba(97, 97, 97, 0.1);
+        color: #616161;
+        padding: 0.2rem 0.4rem;
+        border-radius: 4px;
+    }
+
+    pre {
+        background: #3d3d3d;
+        color: #FFF;
+        font-family: 'JetBrainsMono', monospace;
+        padding: 0.75rem 1rem;
+        border-radius: 0.5rem;
+        overflow-x: auto;
+
+        code {
+            color: inherit;
+            padding: 0;
+            background: none;
+            font-size: 0.8rem;
+        }
+    }
+
+    img {
+        max-width: 100%;
+        height: auto;
+    }
+
+    blockquote {
+        padding-left: 1rem;
+        border-left: 4px solid #8B9E6B;
+        margin: 1rem 0;
+        color: #3F4E4F;
+        font-style: italic;
+    }
+
+    hr {
+        border: none;
+        border-top: 2px solid rgba(13, 13, 13, 0.1);
+        margin: 2rem 0;
+    }
+}

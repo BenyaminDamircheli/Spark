@@ -1,0 +1,12 @@
+.frame {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    height: 100vh;
+    overflow-y: overlay;
+    -webkit-app-region: drag;
+}
+
+.form{
+    -webkit-app-region: none;
+}

@@ -1,0 +1,215 @@
+.frame {
+    display: block;
+    margin-left: 1px;
+    backdrop-filter: blur(10);
+    background-color: #F9F2E2;
+  
+    &.isNew {
+      // ideal default height of empty editor
+      min-height: 55px;
+    }
+  }
+
+  .editor {
+    display: block;
+    width: 100%;
+    width: calc(100% - 120px);
+    max-width: 600px;
+  
+    p {
+      line-height: 1.45;
+  
+      &:first-child {
+        margin-top: 0;
+      }
+  
+      &:last-child {
+        margin-bottom: 0;
+      }
+    }
+  
+    a {
+      color: #4A6D4A;
+  
+      &:hover {
+        color: #3F4E4F;
+      }
+    }
+  
+    &.editorBig {
+      p {
+        font-size: 1.2em;
+        margin-top: -2px;
+      }
+    }
+  
+    &.responding {
+      p {
+        --bg-size: 400%;
+        background: linear-gradient(
+            -90deg,
+            #5F4B32,
+            #3F4E4F,
+            #5F4B32
+          )
+          0 0 / var(--bg-size) 100%;
+        color: transparent;
+        background-clip: text;
+        -webkit-background-clip: text;
+        transition: all ease-in-out 120ms;
+        animation: move-bg 4s infinite linear;
+      }
+    }
+  
+    @media (prefers-reduced-motion: no-preference) {
+      .responding {
+        p {
+          animation: move-bg 8s linear infinite;
+        }
+      }
+  
+      @keyframes move-bg {
+        to {
+          background-position: calc(-1 * var(--bg-size)) 0;
+        }
+      }
+    }
+  }
+  
+  .uneditable {
+    cursor: default;
+    .highlight {
+      color: #4A6D4A;
+    }
+  }
+  
+  .footer {
+    margin-top: 16px;
+    margin-bottom: 4px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+  
+    .left {
+      display: flex;
+      align-items: center;
+  
+      .button {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        height: 26px;
+        width: 26px;
+        color: #5F4B32;
+        border-radius: 9px;
+        transition: all ease-in-out 120ms;
+        margin-right: 7px;
+        z-index: 0;
+  
+        &:hover {
+          cursor: pointer;
+          color: #3F4E4F;
+        }
+  
+        &.active {
+          background: #E5D9B6;
+        }
+  
+        &:active {
+          background: #D9BFAF;
+        }
+      }
+  
+      .tags {
+        display: flex;
+        align-items: center;
+        border-radius: 8px;
+        padding: 3px 8px 3px 4px;
+        background: #E5D9B6;
+        height: 30px;
+  
+        .icon {
+          height: 18px;
+          width: 18px;
+          margin-right: 3px;
+          color: #5F4B32;
+        }
+  
+        .newTag {
+          border: none;
+          outline: none;
+          background: transparent;
+        }
+      }
+    }
+  
+    .right {
+      display: flex;
+      align-items: center;
+      z-index: 10;
+      position: relative;
+  
+      .button {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        height: 28px;
+        background-color: #4A6D4A;
+        border-radius: 8px;
+        transition: all ease-in-out 120ms;
+        padding: 0 18px;
+        line-height: 28px;
+        color: #F9F2E2;
+        font-size: 0.9em;
+        border-radius: 90px;
+        user-select: none;
+        font-weight: 500;
+
+        &.active {
+          background: #3F4E4F;
+        }
+
+        &:hover {
+          cursor: pointer;
+          background: #3F4E4F;
+          font-weight: 600;
+        }
+
+        &:active {
+          background: #5F4B32;
+        }
+      }
+  
+      .deleteButton {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        height: 28px;
+        background: #F9F2E2;
+        opacity: 0.9;
+        border-radius: 8px;
+        transition: all ease-in-out 120ms;
+        padding: 0 14px;
+        line-height: 28px;
+        color: #ff3512;
+        font-size: 0.9em;
+        border-radius: 90px;
+        user-select: none;
+        margin-right: 6px;
+  
+        .icon {
+          height: 18px;
+          width: 18px;
+        }
+  
+        &:active {
+          filter: brightness(0.9);
+        }
+  
+        &:hover {
+          cursor: pointer;
+          background: #ffdbdb;
+        }
+      }
+    }
+  }
