@@ -101,7 +101,7 @@ export default function Chat() {
       <Dialog.Root>
         <Dialog.Trigger asChild>
           <div className={styles.iconHolder}>
-            <BrainCircuit className={styles.chatIcon} />
+            <BrainCircuit className={styles.chatIcon} strokeWidth={3}/>
           </div>
         </Dialog.Trigger>
         <Dialog.Portal container={container}>
@@ -112,7 +112,7 @@ export default function Chat() {
                 <div className={styles.header}>
                   <div className={styles.wrapper}>
                     <Blobs show={querying} />
-                    <Dialog.Title className={styles.DialogTitle}>
+                    <Dialog.Title className={`${styles.DialogTitle}`}>
                       Chat with your journal
                     </Dialog.Title>
                     <div className={styles.buttons}>

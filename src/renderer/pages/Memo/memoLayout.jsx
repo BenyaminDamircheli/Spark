@@ -16,6 +16,7 @@ import Chat from './Chat';
 
 
 
+
 export default function memoLayout({ children }){
     const {memoName} = useParams();
      const { index, refreshIndex } = useIndexContext();
@@ -41,7 +42,7 @@ export default function memoLayout({ children }){
                             </div>
                         </div>
                     </div>
-                    <SideBar />
+                    {/* <SideBar /> */}
                 </div>
                 <div className={`${styles.content} ${osStyles}`}>
                     <div className={`${styles.nav}`}>
@@ -55,17 +56,17 @@ export default function memoLayout({ children }){
                             >
                                 {now} <span className='p-1'>·</span> 
                                 <span className='font-semibold text-[#8B9E6B]'>{memoName} </span> 
-                                <span className='font-semibold text text-[#8B9E6B]'>/ Feed</span>
+                                <span className='p-1'>·</span> 
+                                <span className='font-semibold text bg-[#3F4E4F] text-[#F9F2E2] rounded-md px-2'>{index.size} entries</span>
                             </motion.span>
 
                         </div>
-                        <div className={`${styles.right} gap-[10px]`}>
+                        <div className={`${styles.right} gap-1`}>
                             <Toasts />
                             <Chat />
                             <Search />
-                            <Settings strokeWidth={3} className='w-5' />
-                            <Link to='/' className=''>
-                                <Home strokeWidth={3} className='w-5' />
+                            <Link to='/' className='inline-flex items-center justify-center h-[30px] w-[30px] rounded-lg transition-all duration-120 ease-in-out bg-transparent relative overflow-hidden hover:cursor-pointer hover:bg-[#E5D9B6] hover:text-[#3F4E4F] active:bg-[#E7DFC6]'>
+                                <Home strokeWidth={3} className='text-[#5F4B32] h-5 w-5 transition-all duration-220 ease-in-out delay-[40ms] ' />
                             </Link>
                         </div>
                     </div>

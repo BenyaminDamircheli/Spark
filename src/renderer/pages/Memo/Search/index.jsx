@@ -155,8 +155,8 @@ export default function Search() {
     <>
       <Dialog.Root>
         <Dialog.Trigger asChild>
-          <div className={styles.iconHolder}>
-            <SearchIcon trokeWidth={4} className='w-5'/>
+          <div className={`inline-flex items-center justify-center h-[30px] w-[30px] rounded-lg transition-all duration-120 ease-in-out bg-transparent relative overflow-hidden hover:cursor-pointer hover:bg-[#E5D9B6] hover:text-[#3F4E4F] active:bg-[#E7DFC6]`}>
+            <SearchIcon trokeWidth={4} className='text-[#5F4B32] h-5 w-5 transition-all duration-220 ease-in-out delay-[40ms] hover:opacity-100'/>
           </div>
         </Dialog.Trigger>
         <Dialog.Portal container={container}>

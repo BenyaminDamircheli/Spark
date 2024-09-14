@@ -45,17 +45,7 @@ export default function OptionsBar({ options, setOptions, onSubmit }) {
           onClick={toggleRecent}
         >
           ↓ Oldest
-        </button>
-        <div className={styles.sep}>•</div>
-        <button
-          className={`${styles.button} ${
-            options.onlyHighlighted && styles.active
-          }`}
-          name={'onlyHighlighted'}
-          onClick={flipValue}
-        >
-          <Tag className="w-5 h-5" strokeWidth={3} /> Highlighted
-        </button>
+        </button>        
       </div>
       <div className={styles.right}>
         <div className={styles.switch}>

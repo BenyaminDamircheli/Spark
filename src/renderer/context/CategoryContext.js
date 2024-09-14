@@ -48,7 +48,7 @@ export const CategoryContextProvider = ({ children }) => {
     window.electron.ipc
       .invoke('categories-create', categoryName, color)
       .then((categories) => {
-        setCategories(categories);
+        setCategories(new Map(categories));
       });
   }, []);
 
@@ -56,7 +56,7 @@ export const CategoryContextProvider = ({ children }) => {
     window.electron.ipc
       .invoke('categories-delete', categoryName)
       .then((categories) => {
-        setCategories(categories);
+        setCategories(new Map(categories));
       });
   }, []);
 
@@ -67,16 +67,11 @@ export const CategoryContextProvider = ({ children }) => {
         postPath,
         categoryName
       );
-      setCategories(updatedCategories);
+      setCategories(new Map(updatedCategories));
     } catch (error) {
       console.error('Error updating post category:', error);
-      // Optionally, you can add some user feedback here
     }
   }, []);
-
-  const updateCategory = (categoryName, content) => {
-    // Implement if needed
-  };
 
   const categoryContextValue = {
     open,

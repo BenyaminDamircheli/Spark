@@ -13,8 +13,6 @@ import styles from '../Post.module.scss';
 import { Stars } from 'lucide-react';
 import { AIIcon } from '../../../../../icons';
 
-
-
 export default function Reply({
     postPath,
     isLast = false,
@@ -26,19 +24,15 @@ export default function Reply({
     searchTerm = { searchTerm },
 }) {
     const {currentMemo} = useMemoContext();
-    const {post} = usePost(postPath);
+    const {post, cycleColor} = usePost(postPath);
     const [editable, setEditable] = useState(false);
-    
 
-
-    const toggleEditable = () => {
-        setEditable(!editable);
-    }
+    const toggleEditable = () => setEditable(!editable);
 
     if (!post) return;
 
     const created = DateTime.fromISO(post.data.createdAt);
-    const updated = DateTime.fromISO(post.data.updatedAt);
+    const replies = post?.data?.replies || [];
     const isReply = post?.data?.isReply || false;
     const isAI = post?.data?.isAI || false;
 
@@ -49,11 +43,12 @@ export default function Reply({
           <div
             className={`${styles.connector} ${isFirst && styles.first}`}
           ></div>
-
           <div
             className={`${styles.ball} ${isAI && styles.ai}`}
-            
-            
+            onDoubleClick={cycleColor}
+            style={{
+              backgroundColor: highlightColor ?? 'var(--border)',
+            }}
           >
             {isAI && <AIIcon className={styles.iconAI} />}
           </div>
@@ -62,7 +57,7 @@ export default function Reply({
               (!isLast || replying) && styles.show
             } `}
             style={{
-              borderColor:  'grey',
+              borderColor: highlightColor ?? 'var(--border)',
             }}
           ></div>
         </div>

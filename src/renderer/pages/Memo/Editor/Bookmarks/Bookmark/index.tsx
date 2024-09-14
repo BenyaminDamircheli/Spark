@@ -6,24 +6,38 @@ import { useBookmarksContext } from '../../../../../context/BookmarksContext';
 import { Link2 } from 'lucide-react';
 import styles from './Bookmark.module.scss'
 
-const isTwitterUrl = (url) => {
+const isTwitterUrl = (url:string) => {
   // regex to check if the url is a twitter url.
   const twitterRegex =
     /^https?:\/\/(www\.)?(twitter\.com|x\.com)\/[a-zA-Z0-9_]+\/status\/[0-9]+/;
   return twitterRegex.test(url);
 };
 
-const isUrlYouTubeVideo = (url) => {
+const isUrlYouTubeVideo = (url:string) => {
   // regex to check if the url is a youtube url.
   const regExp =
     /^(https?:\/\/)?(www\.)?(youtube\.com\/watch\?v=|youtu\.be\/)([a-zA-Z0-9_-]{11})/;
   return regExp.test(url);
 };
 
-export default function BookmarkPreview({ url }) {
+// Add this type definition
+type BookmarkData = {
+  images?: string[];
+  title?: string;
+  favicon?: string;
+  host?: string;
+  aiCard?: {
+    summary?: string;
+    highlights?: string[];
+    buttons?: { href: string; title: string }[];
+    category?: string;
+  };
+};
+
+export default function BookmarkPreview({ url }: { url: string }) {
   const { getBookmarks } = useBookmarksContext();
   const [expanded, setExpanded] = useState(false);
-  const [preview, setPreview] = useState(null);
+  const [preview, setPreview] = useState<BookmarkData | null>(null);
 
   const toggleExpanded = () => {
     setExpanded(!expanded);
@@ -50,7 +64,7 @@ export default function BookmarkPreview({ url }) {
       <div className="bg-[#252422] rounded-[10px] animate-pulse w-[200px] h-[200px] m-2 transition-all duration-200 ease-in-out"></div>
     );
 
-  const createTwitterEmbed = (url) => {
+  const createTwitterEmbed = (url:string) => {
     const tweetIdRegex = /\/status\/(\d+)/;
     const match = url.match(tweetIdRegex);
     const tweetId = match ? match[1] : null;
@@ -68,7 +82,7 @@ export default function BookmarkPreview({ url }) {
     }
   };
 
-  const createYoutubeEmbed = (url) => {
+  const createYoutubeEmbed = (url:string) => {
     const youtubeRegEx =
       /^.*(youtu.be\/|v\/|e\/|u\/\w+\/|embed\/|v=)([^#\&\?]*).*/;
     const match = url.match(youtubeRegEx);
@@ -120,9 +134,9 @@ export default function BookmarkPreview({ url }) {
         <div>{preview?.aiCard?.summary}</div>
 
         {/* Highlights */}
-        {preview?.aiCard?.highlights?.length > 0 && (
+        {(preview?.aiCard?.highlights?.length ?? 0) > 0 && (
           <ul className={`${styles.highlights} ${expanded && styles.show}`}>
-            {preview.aiCard.highlights.map((highlight, index) => (
+            {preview.aiCard?.highlights?.map((highlight, index) => (
               <li key={`preview-${index}`}>{highlight}</li>
             ))}
             <div
@@ -134,9 +148,9 @@ export default function BookmarkPreview({ url }) {
 
         {/* Buttons */}
 
-        {preview?.aiCard?.buttons?.length > 0 && (
+        {(preview?.aiCard?.buttons?.length ?? 0) > 0 && (
           <div className={styles.buttons}>
-            {preview?.aiCard?.buttons.map((btn, index) => (
+            {preview?.aiCard?.buttons?.map((btn, index) => (
               <a
                 key={`button-${index}`}
                 href={btn.href}

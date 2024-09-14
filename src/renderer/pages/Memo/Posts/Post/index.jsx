@@ -1,6 +1,5 @@
 import { useEffect, useState, useCallback, useRef, memo, useMemo } from 'react';
 import { useParams } from 'react-router-dom';
-//import styles from './Post.module.scss';
 import { useEditor, EditorContent } from '@tiptap/react';
 import StarterKit from '@tiptap/starter-kit';
 import Placeholder from '@tiptap/extension-placeholder';
@@ -14,7 +13,7 @@ import { AnimatePresence, motion } from 'framer-motion';
 import Reply from './Reply';
 import { VirtualListContext } from '../../../../context/VirtualListContext';
 import styles from './Post.module.scss';
-import { NeedleIcon, ReflectIcon } from '../../../../icons';
+import { NeedleIcon, ReflectIcon, AIIcon } from '../../../../icons';
 import Category from './Category';
 import { useCategoryContext } from '../../../../context/CategoryContext';
 import { Book, NotebookPen, Paperclip, Pen, Stars } from 'lucide-react';
@@ -28,10 +27,15 @@ const Post = memo(({ postPath, searchTerm = null, repliesCount = 0 }) => {
   const [replying, setReplying] = useState(false);
   const [isAIReplying, setIsAiReplying] = useState(false);
   const [editable, setEditable] = useState(false);
+  const [currentCategoryColor, setCurrentCategoryColor] = useState('#6B6155');
 
   useEffect(() => {
-    console.log('Post data:', post);
-  }, [post]);
+    if (post?.data?.category) {
+      setCurrentCategoryColor(categories.get(post.data.category).color);
+    } else {
+      setCurrentCategoryColor('#6B6155');
+    }
+  }, [post?.data?.category, categories]);
 
   const closeReply = () => {
     setReplying(false);
@@ -50,16 +54,17 @@ const Post = memo(({ postPath, searchTerm = null, repliesCount = 0 }) => {
   const handleRootMouseLeave = () => setHover(false);
   const containerRef = useRef();
 
-  if (!post) return;
+  if (!post) return null;
 
   const created = DateTime.fromISO(post.data?.createdAt);
   const replies = post?.data?.replies || [];
   const hasReplies = replies.length > 0;
   const isAI = post?.data?.isAI || false;
   const isReply = post?.data?.isReply || false;
-  const highlightColor = post?.data?.highlight
-    ? highlights.get(post.data.highlight).color
-    : 'var(--border)';
+
+  const handleCategoryColorChange = (newColor) => {
+    setCurrentCategoryColor(newColor);
+  };
 
   const renderReplies = () => {
     return replies.map((reply, index) => {
@@ -74,17 +79,17 @@ const Post = memo(({ postPath, searchTerm = null, repliesCount = 0 }) => {
           isLast={isLast}
           isFirst={isFirst}
           replying={replying}
-          highlightColor={highlightColor}
+          highlightColor={currentCategoryColor}
           parentPostPath={postPath}
           reloadParentPost={refreshPost}
           searchTerm={searchTerm}
-          
+          categoryColor={currentCategoryColor}
         />
       );
     });
   };
 
-  if (isReply) return;
+  if (isReply) return null;
 
   return (
     <div
@@ -100,19 +105,19 @@ const Post = memo(({ postPath, searchTerm = null, repliesCount = 0 }) => {
     >
       <div className={styles.post}>
         <div className={styles.left}>
-          {post.data?.isReply && <div className={styles.connector}></div>}
           <Category 
             isAI={isAI}
-            categoryColor={post?.data?.category ? categories.get(post.data.category)?.color : '#6B6155'}
+            categoryColor={currentCategoryColor}
             postPath={postPath}
             currentCategory={post.data.category}
+            onCategoryColorChange={handleCategoryColorChange}
           />
           <div
             className={`${styles.line} ${
               (post.data?.replies?.length > 0 || replying) && styles.show
             }`}
             style={{
-              borderColor: highlightColor,
+              borderColor: currentCategoryColor,
             }}
           ></div>
         </div>
@@ -184,13 +189,13 @@ const Post = memo(({ postPath, searchTerm = null, repliesCount = 0 }) => {
                     (post.data.replies.length > 0 || replying) && styles.show
                   }`}
                   style={{
-                    backgroundColor: highlightColor,
+                    backgroundColor: currentCategoryColor,
                   }}
                 ></div>
                 <div
                   className={`${styles.ball} ${isAIReplying && styles.ai}`}
                   style={{
-                    backgroundColor: highlightColor,
+                    backgroundColor: currentCategoryColor,
                   }}
                 >
                   {isAIReplying && (

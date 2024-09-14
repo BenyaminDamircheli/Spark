@@ -18,7 +18,7 @@ const Message = memo(({ message }) => {
         <div className={`${styles.message} ${isUser ? styles.user : styles.ai}`}>
           <div className={styles.wrap}>
             <div className={styles.ball}>
-              {isUser ? <User className={styles.avatar} /> : <AIIcon className={styles.avatar} />}
+              {isUser ? <User className="w-5 h-5 text-[#F6EFDF]" /> : <AIIcon className={styles.avatar} />}
             </div>
             <div className={styles.text}>{message.content}</div>
           </div>

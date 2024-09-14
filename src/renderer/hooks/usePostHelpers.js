@@ -3,7 +3,7 @@ import {
   createDirectory,
   saveFile,
   deleteFile,
-  getFilePathForNewPost,
+  getNewPostPath,
   getDirectoryPath,
 } from '../utils/fileOperations';
 
@@ -18,17 +18,16 @@ export const getPost = async (postPath) => {
     const post = { content: parsed.content, data: parsed.data };
     return post;
   } catch (error) {
-    // TODO: check and cleanup after these files
+    console.error('Error getting post:', error);
   }
 };
 
 export const attatchToPostCreator =
-  (setPost, getCurrentPilePath) => async (imageData, fileExtension) => {
-    const storePath = getCurrentPilePath();
+  (setPost, getCurrentMemoPath) => async (imageData, fileExtension) => {
+    const storePath = getCurrentMemoPath();
 
     let newAttachments = [];
     if (imageData) {
-      // save image data to a file
       const newFilePath = await window.electron.ipc.invoke('save-file', {
         fileData: imageData,
         fileExtension: fileExtension,
@@ -45,38 +44,31 @@ export const attatchToPostCreator =
         storePath: storePath,
       });
     }
-    // Attachments are stored relative to the base path from the
-    // base directory of the pile
+
     const correctedPaths = newAttachments.map((path) => {
       const pathArr = path.split(/[/\\]/).slice(-4);
       const newPath = window.electron.joinPath(...pathArr);
-
       return newPath;
     });
 
     setPost((post) => {
-      const attachments = [...correctedPaths, ...(post.data.attachments)];
-      const newPost = {
+      const attachments = [...correctedPaths, ...post.data.attachments];
+      return {
         ...post,
         data: { ...post.data, attachments },
       };
-
-      return newPost;
     });
   };
 
 export const detachFromPostCreator =
-  (setPost, getCurrentPilePath) => (attachmentPath) => {
+  (setPost, getCurrentMemoPath) => (attachmentPath) => {
     setPost((post) => {
-      let newPost = JSON.parse(JSON.stringify(post));
-      const newAtt = newPost.data.attachments.filter(
+      const newAttachments = post.data.attachments.filter(
         (a) => a !== attachmentPath
       );
 
-      newPost.data.attachments = newAtt;
-
       const fullPath = window.electron.joinPath(
-        getCurrentPilePath(),
+        getCurrentMemoPath(),
         attachmentPath
       );
 
@@ -90,7 +82,10 @@ export const detachFromPostCreator =
 
       console.log('Attachment removed', attachmentPath);
 
-      return newPost;
+      return {
+        ...post,
+        data: { ...post.data, attachments: newAttachments },
+      };
     });
   };
 
@@ -120,38 +115,26 @@ export const tagActionsCreator = (setPost, action) => {
   };
 };
 
-export const setHighlightCreator = (post, setPost, savePost) => {
-  return (highlight) => {
+export const setCategoryCreator = (setPost, savePost) => {
+  return (category) => {
     setPost((post) => ({
       ...post,
-      data: { ...post.data, highlight: highlight },
+      data: { ...post.data, category: category },
     }));
-    savePost({ highlight: highlight });
+    savePost({ category: category });
   };
 };
 
-export const cycleColorCreator = (post, setPost, savePost, highlightColors) => {
-  return () => {
-    if (!post.data.highlightColor) {
-      const newColor = highlightColors[1];
-      setPost((post) => ({
-        ...post,
-        data: { ...post.data, highlightColor: newColor },
-      }));
-      savePost({ highlightColor: newColor });
-      return;
-    }
-    const currentColor = post.data.highlightColor;
-    const currentIndex = highlightColors.findIndex(
-      (color) => color === currentColor
+export const updatePostCategory = async (postPath, categoryName) => {
+  try {
+    const updatedCategories = await window.electron.ipc.invoke(
+      'categories-update-post',
+      postPath,
+      categoryName
     );
-    const nextIndex = (currentIndex + 1) % highlightColors.length;
-    const nextColor = highlightColors[nextIndex];
-
-    setPost((post) => ({
-      ...post,
-      data: { ...post.data, highlightColor: nextColor },
-    }));
-    savePost({ highlightColor: nextColor });
-  };
+    return updatedCategories;
+  } catch (error) {
+    console.error('Error updating post category:', error);
+    throw error;
+  }
 };

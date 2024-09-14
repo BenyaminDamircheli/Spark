@@ -1,13 +1,15 @@
 import { useState, useEffect, useCallback, useMemo } from "react";
 import { useIndexContext } from "../context/IndexContext";
 import { useMemoContext } from "../context/MemoContext";
+import { useCategoryContext } from "../context/CategoryContext";
 import * as fileOperations from '../utils/fileOperations.js';
 import {
     getPost,
     attatchToPostCreator,
     tagActionsCreator,
-    detachFromPostCreator
+    detachFromPostCreator,
 } from './usePostHelpers.js';
+
 
 const defaultPost = {
     content: '',
@@ -17,9 +19,10 @@ const defaultPost = {
         updatedAt: null,
         tags: [],
         replies: [],
-        attatchments: [],
+        attachments: [],
         referencedPosts: [],
         highlightColor: null,
+        highlight: null,
         area: null,
         parentPostPath: null,
         isAI: false,
@@ -41,6 +44,7 @@ function usePost(
     const { addIndex, removeIndex, refreshIndex, updateIndex } =
       useIndexContext();
     const { getCurrentMemoPath, currentMemo } = useMemoContext();
+    const { updatePostCategory } = useCategoryContext();
     const [updates, setUpdates] = useState(0);
     const [path, setPath] = useState(null);
     const [post, setPost] = useState({ ...defaultPost });
@@ -110,7 +114,7 @@ function usePost(
           console.error(error);
         }
       },
-      [path, post, reloadParentPost]
+      [path, post, reloadParentPost, updatePostCategory]
     );
   
     const addReplyToParent = async (parentPostPath, replyPostPath) => {
@@ -155,7 +159,12 @@ function usePost(
       // delete file and remove from index
       await fileOperations.deleteFile(fullPostPath);
       removeIndex(postPath);
-    }, [postPath, reloadParentPost, parentPostPath, post]);
+      
+      // Remove post from its category
+      if (post.data.category) {
+        await updatePostCategory(postPath, null);
+      }
+    }, [postPath, reloadParentPost, parentPostPath, post, updatePostCategory]);
   
     const postActions = useMemo(
       () => ({
@@ -167,8 +176,16 @@ function usePost(
         attachToPost: attatchToPostCreator(setPost, getCurrentMemoPath),
         detachFromPost: detachFromPostCreator(setPost, getCurrentMemoPath),
         resetPost: () => setPost(defaultPost),
+        updateCategory: async (categoryName) => {
+          await updatePostCategory(postPath, categoryName);
+          setPost((post) => ({
+            ...post,
+            data: { ...post.data, category: categoryName },
+          }));
+          await savePost({ category: categoryName });
+        },
       }),
-      [post]
+      [post, savePost, updatePostCategory, postPath]
     );
   
     return {

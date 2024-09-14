@@ -1,9 +1,12 @@
-
 import { useCallback, useState, useEffect, memo } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import BookmarkPreview from './Bookmark';
 import { useMemoToastsContext } from '../../../../context/ToastContext';
 
+interface LinkPreviewsProps {
+  post: { content?: string };
+  editable?: boolean;
+}
 
 const extractLinks = (htmlString: string) => {
   const parser = new DOMParser();
@@ -25,7 +28,7 @@ const extractLinks = (htmlString: string) => {
   return urls.filter((value, index, self) => self.indexOf(value) === index);
 };
 
-const LinkPreviews = memo(({ post, editable = false }) => {
+const LinkPreviews = memo(({ post, editable = false }: LinkPreviewsProps) => {
   const { addNotification } = useMemoToastsContext();
   const getPreview = (url: string) => {
     return window.electron.ipc.invoke('get-link-preview', url);

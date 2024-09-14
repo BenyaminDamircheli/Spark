@@ -365,6 +365,7 @@ const Editor = memo(({
             tabIndex="0"
             className={`${styles.button}`}
             onClick={handleSubmit}
+            style={{ zIndex: 0 }} // Add this line
           >
             {renderPostButton()}
           </button>
