@@ -25,7 +25,7 @@ Spark is an AI enabled journaling app that allows users to "speak" to their jour
 
 
 ## Important note on using the AI features
-If you want to use the AI features, you'll need to download Ollama and run it locally. You can download it [here](https://ollama.com/download) for free.
+If you want to use the AI features, you'll need to download Ollama and run it locally (your performance will be dependent on your machine's computational power). You can download it [here](https://ollama.com/download) for free.
 Then make sure to download and pull "llama3.1:8b" and "mxbai-embed-large" models. If you're not sure how to do this, you can follow the instructions [here](https://github.com/ollama/ollama/tree/main).
 
 ## Final thoughts
