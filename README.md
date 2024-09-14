@@ -9,28 +9,20 @@ Spark is an AI enabled journaling app that allows users to "speak" to their jour
 ## Features
 
 ### 1. Write posts, reply to them with either your own thoughts or AI guided reflections.
+[![Spark Posts](https://img.youtube.com/vi/g8-m3qZAPfA/0.jpg)](https://www.youtube.com/watch?v=g8-m3qZAPfA "Spark posts")
 
-<video width="500" height="500" controls>
-  <source src="./videos/write-spark-post.mp4" type="video/mp4">
-</video>
 
 ### 2. Embed videos, tweets, websites and other links as bookmarks in your journal posts.
+[![Spark bookmarks](https://img.youtube.com/vi/mVj9Etl_z5I/0.jpg)](https://youtu.be/mVj9Etl_z5I "Spark bookmarks")
 
-<video width="500" height="500" controls>
-  <source src="./videos/Spark-bookmarks.mp4" type="video/mp4">
-</video>
 
 ### 3. Search through your journal posts by keywords or semantic meaning.
+[![Spark search](https://img.youtube.com/vi/7YPVkkhC55E/0.jpg)](https://youtu.be/7YPVkkhC55E "Spark search")
 
-<video width="500" height="500" controls>
-  <source src="./videos/Spark-search.mp4" type="video/mp4">
-</video>
 
 ### 4. Speak with your journal to help you reflect on your thoughts and feelings.
+[![Spark AI reflections](https://img.youtube.com/vi/aRu3FbmgELU/0.jpg)](https://youtu.be/aRu3FbmgELU "Spark AI reflections")
 
-<video width="500" height="500" controls>
-  <source src="./videos/Spark-chat.mp4" type="video/mp4">
-</video>
 
 ## Important note on using the AI features
 If you want to use the AI features, you'll need to download Ollama and run it locally. You can download it [here](https://ollama.com/download) for free.
