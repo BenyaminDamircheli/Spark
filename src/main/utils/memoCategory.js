@@ -15,7 +15,7 @@ const defaultCategories = new Map([
 
 class MemoCategory {
     constructor() {
-        this.filename = 'categories.json';
+        this.filename = 'category.json';
         this.memoPath = null;
         this.categories = new Map();
     }
@@ -71,7 +71,7 @@ class MemoCategory {
             posts: []
         }
 
-        this.categories.set(categoryName, [categoryName, newCategory]);
+        this.categories.set(categoryName, newCategory);
         
         return this.categories;
     }
@@ -122,7 +122,51 @@ class MemoCategory {
             this.save();
         }
     }
-    
+
+    updatePostCategory(postPath, categoryName) {
+        // Ensure the postPath is absolute
+        const fullPostPath = path.isAbsolute(postPath) ? postPath : path.join(this.memoPath, postPath);
+
+        // Check if the file exists
+        if (!fs.existsSync(fullPostPath)) {
+            console.error(`File not found: ${fullPostPath}`);
+            return this.categories; // Return current categories without changes
+        }
+
+        // Remove the post from its current category
+        for (const [name, category] of this.categories) {
+            const index = category.posts.indexOf(postPath);
+            if (index > -1) {
+                category.posts.splice(index, 1);
+            }
+        }
+
+        // Add the post to the new category
+        if (categoryName) {
+            if (!this.categories.has(categoryName)) {
+                this.createCategory(categoryName);
+            }
+            const category = this.categories.get(categoryName);
+            category.posts.push(postPath);
+        }
+
+        // Update the post's frontmatter
+        const fileContent = fs.readFileSync(fullPostPath, 'utf-8');
+        const { data, content } = matter(fileContent);
+        data.category = categoryName || null;
+        const updatedContent = matter.stringify(content, data);
+        fs.writeFileSync(fullPostPath, updatedContent);
+
+        this.save();
+        return this.categories;
+    }
+
+    save() {
+        const categoriesFilePath = path.join(this.memoPath, this.filename);
+        const data = JSON.stringify(Array.from(this.categories.entries()));
+        fs.writeFileSync(categoriesFilePath, data, 'utf-8');
+    }
+
 }
 
 module.exports = new MemoCategory();

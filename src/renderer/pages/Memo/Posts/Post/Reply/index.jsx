@@ -11,6 +11,8 @@ import usePost from '../../../../../hooks/usePost';
 import { AnimatePresence, motion } from 'framer-motion';
 import styles from '../Post.module.scss';
 import { Stars } from 'lucide-react';
+import { AIIcon } from '../../../../../icons';
+
 
 
 export default function Reply({
@@ -26,6 +28,8 @@ export default function Reply({
     const {currentMemo} = useMemoContext();
     const {post} = usePost(postPath);
     const [editable, setEditable] = useState(false);
+    
+
 
     const toggleEditable = () => {
         setEditable(!editable);
@@ -49,18 +53,16 @@ export default function Reply({
           <div
             className={`${styles.ball} ${isAI && styles.ai}`}
             
-            style={{
-              backgroundColor: 'red',
-            }}
+            
           >
-            {isAI && <Stars />}
+            {isAI && <AIIcon className={styles.iconAI} />}
           </div>
           <div
             className={`${styles.line} ${isAI && styles.ai} ${
               (!isLast || replying) && styles.show
             } `}
             style={{
-              borderColor: highlightColor ?? 'gray',
+              borderColor:  'grey',
             }}
           ></div>
         </div>

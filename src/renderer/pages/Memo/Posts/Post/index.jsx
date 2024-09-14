@@ -17,7 +17,7 @@ import styles from './Post.module.scss';
 import { NeedleIcon, ReflectIcon } from '../../../../icons';
 import Category from './Category';
 import { useCategoryContext } from '../../../../context/CategoryContext';
-import { Stars } from 'lucide-react';
+import { Book, NotebookPen, Paperclip, Pen, Stars } from 'lucide-react';
 
 const Post = memo(({ postPath, searchTerm = null, repliesCount = 0 }) => {
   console.log('Post component rendered with path:', postPath);
@@ -102,8 +102,10 @@ const Post = memo(({ postPath, searchTerm = null, repliesCount = 0 }) => {
         <div className={styles.left}>
           {post.data?.isReply && <div className={styles.connector}></div>}
           <Category 
-          isAI={isAI}
-          categoryColor={post?.data?.category}
+            isAI={isAI}
+            categoryColor={post?.data?.category ? categories.get(post.data.category)?.color : '#6B6155'}
+            postPath={postPath}
+            currentCategory={post.data.category}
           />
           <div
             className={`${styles.line} ${
@@ -147,7 +149,7 @@ const Post = memo(({ postPath, searchTerm = null, repliesCount = 0 }) => {
             >
               <div className={styles.actions}>
                 <button className={styles.openReply} onClick={toggleReplying}>
-                  <NeedleIcon className={styles.icon} />
+                  <Paperclip className={styles.icon} />
                   Add another entry
                 </button>
                 <div className={styles.sep}>/</div>

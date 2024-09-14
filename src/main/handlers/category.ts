@@ -17,4 +17,8 @@ ipcMain.handle('categories-create', (event, categoryName) => {
     memoCategory.createCategory(categoryName);
 })
 
+ipcMain.handle('categories-update-post', (event, postPath, categoryName) => {
+    return memoCategory.updatePostCategory(postPath, categoryName);
+})
+
 

@@ -44,9 +44,9 @@ export const CategoryContextProvider = ({ children }) => {
     setCategories(newMap);
   }, []);
 
-  const createCategory = useCallback(async (categoryName) => {
+  const createCategory = useCallback(async (categoryName, color) => {
     window.electron.ipc
-      .invoke('categories-create', categoryName)
+      .invoke('categories-create', categoryName, color)
       .then((categories) => {
         setCategories(categories);
       });
@@ -58,6 +58,20 @@ export const CategoryContextProvider = ({ children }) => {
       .then((categories) => {
         setCategories(categories);
       });
+  }, []);
+
+  const updatePostCategory = useCallback(async (postPath, categoryName) => {
+    try {
+      const updatedCategories = await window.electron.ipc.invoke(
+        'categories-update-post',
+        postPath,
+        categoryName
+      );
+      setCategories(updatedCategories);
+    } catch (error) {
+      console.error('Error updating post category:', error);
+      // Optionally, you can add some user feedback here
+    }
   }, []);
 
   const updateCategory = (categoryName, content) => {
@@ -72,6 +86,7 @@ export const CategoryContextProvider = ({ children }) => {
     refreshCategories,
     createCategory,
     deleteCategory,
+    updatePostCategory,
   };
 
   return (

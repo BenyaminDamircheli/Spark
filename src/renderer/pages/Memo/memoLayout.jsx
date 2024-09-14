@@ -4,10 +4,12 @@ import { useIndexContext } from '../../context/IndexContext';
 import {DateTime} from 'luxon';
 import { AnimatePresence, motion } from 'framer-motion';
 import styles from './Memo.module.scss';
-import { Search, Home, Settings, Brain, BrainCircuit} from 'lucide-react';
+import {Home, Settings, Brain, BrainCircuit} from 'lucide-react';
 import SideBar from './SideBar';
+import Search from './Search';
 import BookmarkPreviews from './BookmarkPage';
 import Toasts from './Toasts';
+import Chat from './Chat';
 
 
 
@@ -57,10 +59,10 @@ export default function memoLayout({ children }){
                             </motion.span>
 
                         </div>
-                        <div className={`${styles.right} gap-[10px] `}>
+                        <div className={`${styles.right} gap-[10px]`}>
                             <Toasts />
-                            <BrainCircuit strokeWidth={3} className='w-5' />
-                            <Search strokeWidth={4} className='w-5' />
+                            <Chat />
+                            <Search />
                             <Settings strokeWidth={3} className='w-5' />
                             <Link to='/' className=''>
                                 <Home strokeWidth={3} className='w-5' />

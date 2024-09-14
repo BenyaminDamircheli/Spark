@@ -1,14 +1,36 @@
-import {useState, useEffect} from "react";
+import { useState, useEffect } from "react";
 import * as DropdownMenu from "@radix-ui/react-dropdown-menu";
 import styles from "./Category.module.scss";
 import { useCategoryContext } from "../../../../../context/CategoryContext";
+import { useMemoContext } from "../../../../../context/MemoContext";
 
 const Category = ({
     isAI,
     categoryColor,
-    setCategory = () => {},
+    postPath,
+    currentCategory,
 }) => {
-    const { categories, openCategories, onOpenChange } = useCategoryContext();
+    const { categories, openCategories, onOpenChange, updatePostCategory } = useCategoryContext();
+    const { getCurrentMemoPath } = useMemoContext();
+    const [currentCategoryColor, setCurrentCategoryColor] = useState(categoryColor);
+
+    useEffect(() => {
+        if (currentCategory && categories.has(currentCategory)) {
+            setCurrentCategoryColor(categories.get(currentCategory).color);
+        } else {
+            setCurrentCategoryColor('#6B6155'); // Default color when no category is selected
+        }
+    }, [currentCategory, categories]);
+
+    const handleCategoryChange = async (categoryName) => {
+        const fullPostPath = getCurrentMemoPath(postPath);
+        await updatePostCategory(fullPostPath, categoryName);
+        if (categoryName && categories.has(categoryName)) {
+            setCurrentCategoryColor(categories.get(categoryName).color);
+        } else {
+            setCurrentCategoryColor('#6B6155');
+        }
+    };
 
     const renderCategories = () => {
         return Array.from(categories, ([category, data], index) => {
@@ -16,7 +38,7 @@ const Category = ({
                 <DropdownMenu.Item
                     key={`category-${category}`}
                     className={styles.DropdownMenuItem}
-                    onSelect={() => setCategory(category)}
+                    onSelect={() => handleCategoryChange(category)}
                 >
                     <div
                         className={styles.menuBall}
@@ -35,7 +57,7 @@ const Category = ({
                     tabIndex={2}
                     className={`${styles.ball} ${isAI && styles.ai}`}
                     style={{
-                        backgroundColor: categoryColor,
+                        backgroundColor: currentCategoryColor,
                     }}
                     aria-label="Change category"
                 ></button>
@@ -50,7 +72,7 @@ const Category = ({
                 >
                     <DropdownMenu.Item
                         className={styles.DropdownMenuItem}
-                        onSelect={() => setCategory(null)}
+                        onSelect={() => handleCategoryChange(null)}
                     >
                         <div
                             className={styles.menuBall}

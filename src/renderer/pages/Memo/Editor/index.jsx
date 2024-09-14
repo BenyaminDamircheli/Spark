@@ -54,8 +54,8 @@ const Editor = memo(({
     savePost,
     addTag,
     removeTag,
-    // attachToPost,
-    // detachFromPost,
+    attachToPost,
+    detachFromPost,
     setContent,
     resetPost,
     deletePost,
@@ -92,25 +92,25 @@ const Editor = memo(({
     if (closeReply) closeReply();
   };
 
-  // const handleFile = (file) => {
-  //   if (file && file.type.indexOf('image') === 0) {
-  //     const fileName = file.name;
-  //     const fileExtension = fileName.split('.').pop();
-  //     const reader = new FileReader();
-  //     reader.onload = (e) => {
-  //       const imageData = reader.result;
-  //       attachToPost(imageData, fileExtension);
-  //     };
-  //     reader.readAsDataURL(file);
-  //   }
-  // };
+  const handleFile = (file) => {
+    if (file && file.type.indexOf('image') === 0) {
+      const fileName = file.name;
+      const fileExtension = fileName.split('.').pop();
+      const reader = new FileReader();
+      reader.onload = (e) => {
+        const imageData = reader.result;
+        attachToPost(imageData, fileExtension);
+      };
+      reader.readAsDataURL(file);
+    }
+  };
 
-  // const handleDataTransferItem = (item) => {
-  //   const file = item.getAsFile();
-  //   if (file) {
-  //     handleFile(file);
-  //   }
-  // };
+  const handleDataTransferItem = (item) => {
+    const file = item.getAsFile();
+    if (file) {
+      handleFile(file);
+    }
+  };
 
   const editor = useEditor({
     extensions: [
@@ -124,36 +124,36 @@ const Editor = memo(({
       CharacterCount
     ],
     editorProps: {
-      // handlePaste: (view, event, slice) => {
-      //   const items = Array.from(event.clipboardData.items);
-      //   let imageHandled = false;
+      handlePaste: (view, event, slice) => {
+        const items = Array.from(event.clipboardData.items);
+        let imageHandled = false;
 
-      //   if (items) {
-      //     items.forEach((item) => {
-      //       if (item.type && item.type.indexOf('image') === 0) {
-      //         imageHandled = true;
-      //         handleDataTransferItem(item);
-      //       }
-      //     })
-      //   }
-      //   return imageHandled;
-      // },
+        if (items) {
+          items.forEach((item) => {
+            if (item.type && item.type.indexOf('image') === 0) {
+              imageHandled = true;
+              handleDataTransferItem(item);
+            }
+          })
+        }
+        return imageHandled;
+      },
 
-      // handleDrop: (view, event, slice, moved) => {
-      //   let imageHandled = false;
-      //   if (
-      //     !moved &&
-      //     event.dataTransfer &&
-      //     event.dataTransfer.items &&
-      //     event.dataTransfer.files &&
-      //     event.dataTransfer.files[0]
-      //   ) {
-      //     const files = Array.from(event.dataTransfer.files);
-      //     files.forEach(handleFile);
-      //     return imageHandled;
-      //   }
-      //   return imageHandled;
-      // }
+      handleDrop: (view, event, slice, moved) => {
+        let imageHandled = false;
+        if (
+          !moved &&
+          event.dataTransfer &&
+          event.dataTransfer.items &&
+          event.dataTransfer.files &&
+          event.dataTransfer.files[0]
+        ) {
+          const files = Array.from(event.dataTransfer.files);
+          files.forEach(handleFile);
+          return imageHandled;
+        }
+        return imageHandled;
+      }
     },
     autofocus: true,
     editable: editable,
@@ -284,7 +284,7 @@ const Editor = memo(({
     }
   }, [post, editor]);
 
-  // const triggerAttachment = () => attachToPost();
+  const triggerAttachment = () => attachToPost();
 
   useEffect(() => {
     if (editor) {
@@ -303,7 +303,7 @@ const Editor = memo(({
   }, [deleteStep, deletePost, closeReplyFunction]);
 
   const isBig = useCallback(() => {
-    return editor?.storage.characterCount.characters() < 280;
+    return editor?.storage.characterCount.characters() > 280;
   }, [editor]);
 
   const renderPostButton = () => {
@@ -334,7 +334,7 @@ const Editor = memo(({
         <div className={styles.uneditable}>
           <div
             key="uneditable"
-            className={`${styles.editor} ${isBig() && 'text-xs!'}`}
+            className={`${styles.editor} ${isBig() && styles.big}`}
             dangerouslySetInnerHTML={{ __html: previewContent }}
           />
         </div>
@@ -345,9 +345,7 @@ const Editor = memo(({
       {editable && (
         <div className={styles.footer}>
         <div className={styles.left}>
-          {/* <button className={styles.button} onClick={triggerAttachment}>
-            <Image className='w-5 h-5' strokeWidth={2.7} />
-          </button> */}
+          
         </div>
         <div className={styles.right}>
           {isReply && (
@@ -365,7 +363,7 @@ const Editor = memo(({
           )}
           <button
             tabIndex="0"
-            className={`${styles.button} z-[10]`}
+            className={`${styles.button}`}
             onClick={handleSubmit}
           >
             {renderPostButton()}

@@ -128,14 +128,14 @@ class MemoIndex {
     try {
       let fullPath = path.join(this.memoPath, filePath);
       let fileContent = fs.readFileSync(fullPath, 'utf8');
-      let { content, data: metadata } = matter(fileContent);
+      let { content, data: metedata } = matter(fileContent);
 
       content =
-        `First entry at ${new Date(metadata.createdAt).toString()}:\n ` +
+        `First entry at ${new Date(metedata.createdAt).toString()}:\n ` +
         convertHTMLToPlainText(content);
 
       // concat the contents of replies
-      for (let replyPath of metadata.replies) {
+      for (let replyPath of metedata.replies) {
         try {
           let replyFullPath = path.join(this.memoPath, replyPath);
           let replyFileContent = fs.readFileSync(replyFullPath, 'utf8');
@@ -150,7 +150,7 @@ class MemoIndex {
       }
       return content;
     } catch (error) {
-      console.log('Failed to get thread as text');
+      console.log('Failed to get thread as text', error);
     }
   }
 
@@ -191,6 +191,8 @@ class MemoIndex {
 
   remove(relativeFilePath) {
     this.index.delete(relativeFilePath);
+    memoSearchIndex.initializeIndex(this.memoPath, this.index);
+    memoEmbeddings.removeDocument(relativeFilePath);
     this.save();
 
     return this.index;

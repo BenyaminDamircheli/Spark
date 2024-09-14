@@ -29,7 +29,7 @@ export const AIContextProvider = ({ children }) => {
     'ollama',
   );
 
-  const [model, setModel] = useElectronStore('model', 'mistral:7b');
+  const [model, setModel] = useElectronStore('model', 'llama3.1:8b');
   const [embeddingModel, setEmbeddingModel] = useElectronStore(
     'embeddingModel',
     'mxbai-embed-large',

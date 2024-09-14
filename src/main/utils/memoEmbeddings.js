@@ -166,6 +166,14 @@ class MemoEmbeddings {
     const topResults = scores.slice(0, k).map((score) => score.entryPath);
     return topResults;
   }
+
+  removeDocument(entryPath) {
+    if (this.embeddings.has(entryPath)) {
+      this.embeddings.delete(entryPath);
+      this.saveEmbeddings();
+      console.log('🧮 Embedding removed for thread: ', entryPath);
+    }
+  }
 }
 
 module.exports = new MemoEmbeddings();

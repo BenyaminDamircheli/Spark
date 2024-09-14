@@ -7,7 +7,7 @@ ipcMain.handle('index-load', async (event, memoPath: string) => {
 });
 
 ipcMain.handle('index-get', async (event) => {
-    return memoIndex.getIndex();
+    return memoIndex.get();
 })
 
 ipcMain.handle('index-regenerate-embeddings', async(event) => {

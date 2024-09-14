@@ -10,6 +10,10 @@
     }
   }
 
+  .big {
+    font-size: 0.9em;
+  }
+
   .editor {
     display: block;
     width: 100%;
@@ -79,7 +83,9 @@
   .uneditable {
     cursor: default;
     .highlight {
-      color: #4A6D4A;
+      color: #ff3512;
+      font-weight: 600;
+      font-style: italic;
     }
   }
   
@@ -93,6 +99,7 @@
     .left {
       display: flex;
       align-items: center;
+      justify-content: center;
   
       .button {
         display: flex;
