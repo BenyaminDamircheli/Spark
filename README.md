@@ -6,6 +6,8 @@ I wanted a journaling app that was built for thinking in bursts, not in long win
 
 Spark is an AI enabled journaling app that allows users to "speak" to their journal and gain deeper insights into their thoughts and feelings. It's perfect for people who like to think in bursts and want to come back and add onto their thoughts later.
 
+
+
 ## Features
 
 ### 1. Write posts, reply to them with either your own thoughts or AI guided reflections.
@@ -22,6 +24,13 @@ Spark is an AI enabled journaling app that allows users to "speak" to their jour
 
 ### 4. Speak with your journal to help you reflect on your thoughts and feelings.
 [![Spark AI reflections](https://img.youtube.com/vi/aRu3FbmgELU/0.jpg)](https://youtu.be/aRu3FbmgELU "Spark AI reflections")
+
+
+## Screenshots
+![Spark Screenshot](./assets/Screenshot%202024-09-16%20at%2022.39.39.png)
+![Spark Screenshot](./assets/Screenshot%202024-09-16%20at%2022.41.55.png)
+![Spark Screenshot](./assets/Screenshot%202024-09-16%20at%2022.40.16.png)
+![Spark Screenshot](./assets/Screenshot%202024-09-16%20at%2022.41.06.png)
 
 
 ## Important note on using the AI features
